@@ -66,13 +66,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+        //setContentView(R.layout.fragment_gesture_data);
 
         mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
 
         mParentView = findViewById(R.id.container);
         mProgressBar = findViewById(R.id.progressbar);
-        mContent = findViewById(R.id.my_nav_host_fragment);
+        mContent = findViewById(R.id.gestureDataFragment);
 
         mViewModel = ViewModelProviders.of(this).get(SessionViewModel.class);
         mViewModel.monitorConnection()
@@ -112,15 +113,15 @@ public class MainActivity extends AppCompatActivity {
             showError(getString(R.string.wearable_error_device_not_found), ErrorType.FATAL);
         }
 
-        final NavController navController = Navigation.findNavController(this, R.id.my_nav_host_fragment);
-        NavigationUI.setupActionBarWithNavController(this, navController);
+//        final NavController navController = Navigation.findNavController(this, R.id.gestureDataFragment);
+//        NavigationUI.setupActionBarWithNavController(this, navController);
     }
 
-    @Override
-    public boolean onSupportNavigateUp() {
-        return Navigation.findNavController(this, R.id.my_nav_host_fragment)
-            .navigateUp();
-    }
+//    @Override
+//    public boolean onSupportNavigateUp() {
+//        return Navigation.findNavController(this, R.id.my_nav_host_fragment)
+//            .navigateUp();
+//    }
 
     @Override
     public void setTitle(final CharSequence title) {

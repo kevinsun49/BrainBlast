@@ -27,11 +27,19 @@
         android:layout_marginTop="-7dp"/>
 
     <fragment
+        android:id="@+id/gestureDataFragment"
+        android:name="com.bose.wearable.sample.GestureDataFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/my_nav_host_fragment"
-        android:name="androidx.navigation.fragment.NavHostFragment"
-        app:navGraph="@navigation/nav_graph"
-        app:defaultNavHost="true"/>
+        android:label="@string/gesture_data_fragment_title"
+        tools:layout="@layout/fragment_gesture_data"/>
+
+    <!--<fragment
+        android:id="@+id/fragment_gesture_data"
+        android:name="androidx.navigation.fragment."
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:defaultNavHost="true"
+        app:navGraph="@navigation/nav_graph" />-->
 
 </LinearLayout>

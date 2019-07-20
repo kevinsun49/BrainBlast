@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Data Example</string>
+    <string name="app_name">Brain Blast</string>
 
     <string name="device_header">Device</string>
     <string name="device_info">Device Information</string>
