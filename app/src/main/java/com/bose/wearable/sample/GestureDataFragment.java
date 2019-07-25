@@ -8,8 +8,14 @@ package com.bose.wearable.sample;
 //  Copyright © 2018 Bose Corporation. All rights reserved.
 //
 
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.location.Location;
 import android.media.AudioManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,6 +35,11 @@ import com.bose.wearable.sample.viewmodels.GestureEvent;
 import com.bose.wearable.sample.viewmodels.SessionViewModel;
 import com.bose.wearable.services.wearablesensor.GestureConfiguration;
 import com.bose.wearable.services.wearablesensor.GestureType;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -45,11 +56,25 @@ public class GestureDataFragment extends Fragment {
     private GestureConfiguration mGestureConf = GestureConfiguration.EMPTY;
     private RequestQueue queue;
     private String url = "http://10.73.94.150:3000/make_coffee";
+    private FusedLocationProviderClient locationProviderClient;
+    private Location baseCoffeeLocation;
+    private LocationCallback locationCallback;
+    private LocationRequest locationRequest;
+    private float minDistance = 1000;
 
+    @SuppressLint("MissingPermission")
     @Override
     public void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        locationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity().getApplicationContext());
+        locationRequest = new LocationRequest();
+        locationRequest.setInterval(1000);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        baseCoffeeLocation = locationProviderClient.getLastLocation().getResult();
+        baseCoffeeLocation.setLatitude(0);
+        baseCoffeeLocation.setLongitude(0);
     }
 
     @Nullable
@@ -69,6 +94,7 @@ public class GestureDataFragment extends Fragment {
         mRecyclerView.setAdapter(mAdapter);
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public void onActivityCreated(@Nullable final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -80,6 +106,28 @@ public class GestureDataFragment extends Fragment {
 
         mViewModel.gestureEvents()
                 .observe(this, this::onGesture);
+
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    return;
+                }
+
+                if (locationResult.getLastLocation().distanceTo(baseCoffeeLocation) < minDistance) {
+                    Vibrator v = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+                    // Vibrate for 500 milliseconds
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        v.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE));
+                    } else {
+                        //deprecated in API 26
+                        v.vibrate(500);
+                    }
+                }
+            }
+        };
+
+        locationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null);
 
         mAdapter.replace(mViewModel.gestures());
     }
